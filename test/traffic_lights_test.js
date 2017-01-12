@@ -29,8 +29,9 @@ chai.use(chaiAsPromised);
 // });
 
 
-var TrafficLight = require('../public/traffic_lights.js');
+var TrafficLight = require('../public/traffic_lights.js').TrafficLight;
 var NS = Object.create(TrafficLight);
+var timeHelper = require('../public/traffic_lights.js').timeHelper;
 
 describe('TrafficLight', function(){
   describe('Object.create(TrafficLight)', function(){
@@ -84,9 +85,9 @@ describe('TrafficLight', function(){
       done();
     }),
 
-    it('should count down from duration param (in seconds) to zero',function(){
-      var interval = NS.timer(3);
-      this.clock.tick(3000);
+    it('should count down from 5 minutes to zero',function(){
+      var interval = NS.timer(300);
+      this.clock.tick(300000);
       return interval.should.eventually.equal('end timer');
     });
   });
@@ -160,25 +161,30 @@ describe('TrafficLight', function(){
       done();
     });
 
-    it('should call timer;', function(){
-      var playSchedule = function(){
-        return new Promise(function(resolve){
-          NS.switchGreen()
-            .then(() => NS.switchRed())
-          });
-      };
-      playSchedule();
-
-
-      // NS.color.should.equal('yellow');
-      //
-      // this.clock.tick(3500);
-      // NS.color.should.equal('yellow');
-      //
-      // this.clock.tick(5000);
-    });
-
+    it('should should stay green for 5 mins with timer(300)');
+    it('should should turn yellow then red after 5 mins with switchRed()');
+    it('should stay red for 5 mins with timer(300)');
 
   });
 
+});
+
+describe('timeHelper', function(){
+  it('should return mins and secs when given > 60 seconds', function(done){
+    var result = timeHelper(61);
+    result.should.equal('1 mins 1 secs');
+    done();
+  });
+
+  it('should return only secs when given < 60 seconds', function(done){
+    var result = timeHelper(10);
+    result.should.equal('10 secs');
+    done();
+  });
+
+  it('should return only mins when given full mins in seconds', function(done){
+    var result = timeHelper(120);
+    result.should.equal('2 mins ');
+    done();
+  });
 });
