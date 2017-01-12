@@ -3,7 +3,6 @@ var pause = false;
 
 // Traffic lights at intersection
 var trafficLight = {
-  // Set empty properties start out being red
   init: function(name){
     this.name = name;
     this.color = 'red';
@@ -57,6 +56,7 @@ var trafficLight = {
 
 };
 
+
 // Create objects
 var NS = Object.create(trafficLight);
 NS.init('north-south');
@@ -83,7 +83,7 @@ var pauseTraffic = function(){
   console.log('traffic paused');
 };
 
-// jQuery interaction code
+// // jQuery interaction code
 $(document).ready(function(){
   console.log("ready");
   $('#play').on('click', startTraffic);

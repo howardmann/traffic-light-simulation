@@ -1,0 +1,20 @@
+{
+  "name": "traffic_lights",
+  "version": "1.0.0",
+  "main": "public/main.js",
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server",
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "jsdom": "^9.9.1",
+    "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
