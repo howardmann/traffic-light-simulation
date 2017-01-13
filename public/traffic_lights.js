@@ -1,12 +1,9 @@
-var pause = pause || false;
-var played = played || false;
-
 var timeHelper = function(seconds){
   d = parseInt(seconds);
   var m = Math.floor(d % 3600 / 60);
   var s = Math.floor(d % 3600 % 60);
   var mDisplay = m > 0 ? m + (m == 1 ? " mins " : " mins ") : "";
-  var sDisplay = s > 0 ? s + (s == 1 ? " secs" : " secs") : "";
+  var sDisplay = s >= 0 ? s + (s == 1 ? " secs" : " secs") : "";
   return mDisplay + sDisplay;
 };
 
@@ -15,50 +12,72 @@ var TrafficLight = {
     this.name = name;
     this.color = 'red';
     this.interval = 300;
+    this.pauseStatus = false;
+    this.countDown = this.countDown || (this.interval - 5);
     this.cacheDom();
   },
 
   cacheDom: function(){
-    this.$name = $('#traffic').find("."+this.name);
-    this.$timer = $('#timer');
+    this.$name = $("."+this.name);
+    this.$color = this.$name.find('.color');
+    this.$timer = this.$name.find('.timer');
   },
 
-  renderDom: function() {
-    this.$name.css({'backgroundColor': this.color});
-    this.$name.html(this.color.toUpperCase());
+  renderColor: function(){
+    var self = this;
+    var color = self.color;
+    self.$name.css({'backgroundColor': color});
+    self.$color.html(color.toUpperCase());
+    if (color === 'red') {
+      self.$timer.html('STOP');
+    } else if (color === 'yellow') {
+      self.$timer.html('SLOW DOWN');
+    } else if (color === 'green') {
+      self.$timer.html('DRIVE');
+    } else {
+      self.renderTimer();
+    };
+  },
+
+  renderTimer: function(){
+    var color = this.color;
+    var msg = timeHelper(this.countDown) + ' left';
+    if (this.countDown === 0) { return this.$timer.html('')};
+    this.$timer.html(msg);
   },
 
   changeColor: function(color) {
     this.color = color;
-    // console.log(`${this.name} changed ${this.color}`);
-    this.renderDom();
+    this.renderColor();
   },
 
   changeInterval: function(seconds) {
     this.interval = seconds;
-    // console.log('Updated interval', this.interval);
+    this.countDown = this.interval - 5;
   },
 
   timer: function(seconds) {
-    var color = this.color;
-    var $name = this.$name;
+    var self = this;
     return new Promise(function(resolve) {
       var timeLeft = seconds;
-      var formatTime;
-      var nextColor;
-      var interval = setInterval(function() {
-        if (pause) { return; }
-        // console.log(`${color}: ${timeHelper(timeLeft)}`);
-        timeLeft--;
 
-        // // Render message
-        // if (color === 'green') {
-        //   formatMsg = timeHelper(timeLeft + 5) + ' until STOP';
-        //   $name.html(formatMsg);
-        // } else {
-        //   formatMsg = timeHelper(timeLeft) + ' until STOP';
-        //   $name.html(formatMsg);
-        // }
+      var interval = setInterval(function() {
+        if (Crossing.pauseStatus) {
+          self.pauseStatus = true;
+          return;
+        } else {
+          self.pauseStatus = false;
+        }
+
+        if (Crossing.resetStatus) {
+          Crossing.resetStatus = false;
+          clearInterval(interval);
+          return;
+        }
+
+        timeLeft--;
+        self.countDown = timeLeft;
+        self.renderTimer();
 
         if (timeLeft <= 0) {
           clearInterval(interval);
@@ -69,40 +88,43 @@ var TrafficLight = {
   },
 
   switchGreen: function() {
-    var changeColor = this.changeColor.bind(this);
+    var self = this;
     return new Promise(function(resolve) {
-      changeColor('green');
+      self.changeColor('green');
       resolve();
     });
   },
 
   switchRed: function() {
-    var changeColor = this.changeColor.bind(this);
-    var timer = this.timer.bind(this);
+    var self = this;
     return new Promise(function(resolve) {
-      changeColor('yellow');
-      timer(5)
+      self.changeColor('yellow');
+      self.timer(5)
         .then(function() {
-          changeColor('red');
+          self.changeColor('red');
           resolve();
         });
     });
   },
 
   playSchedule: function(){
-    if (pause) { return;};
+    var self = this;
+    // Interval adjusting for yellow light change
+    var interval = this.interval - 5;
 
-    var switchRed = this.switchRed.bind(this);
-    var switchGreen = this.switchGreen.bind(this);
-    var timer = this.timer.bind(this);
-    var interval = this.interval;
+    // Pause condition
+    if (Crossing.pauseStatus) {
+      self.pauseStatus = true;
+      return 'paused';
+    };
 
+    // Play script, start green, stay green for interval duration, switch to yellow for 5 seconds, switch Red and then resolve after 1 second for traffic safety buffer
     return new Promise(function(resolve){
-      switchGreen()
-        .then(() => timer(interval))
-        .then(() => switchRed())
+      self.switchGreen()
+        .then(() => self.timer(interval))
+        .then(() => self.switchRed())
         .then(function(){
-          setTimeout(()=> resolve('played'),1000);
+          resolve('played');
         })
     });
   }
@@ -114,6 +136,9 @@ var Crossing =  {
     this.NS.init('north-south');
     this.EW = Object.create(TrafficLight);
     this.EW.init('east-west');
+    this.pauseStatus = false;
+    this.playStatus = false;
+    this.resetStatus = false;
     this.cacheDom();
     this.bindEvents();
   },
@@ -123,15 +148,16 @@ var Crossing =  {
     this.$pause = $('#traffic').find('#pause');
     this.$button = $('#traffic').find('button');
     this.$select = $('#traffic').find('select');
-    this.$submit = $('#traffic').find('input[type="submit"]');
-    this.$form = $('#traffic').find('form');
+    this.$start = $('#traffic').find('#start');
+    this.$reset = $('#traffic').find('#reset');
   },
 
   bindEvents: function(){
     var self = this;
     this.$play.on('click', this.play.bind(this));
     this.$pause.on('click', this.pause.bind(this));
-    this.$submit.on('click', this.setInterval.bind(this))
+    this.$start.on('click', this.setInterval.bind(this))
+    this.$reset.on('click', this.reset.bind(this))
     this.$play.on('click', function(){
       $(this).removeClass().addClass('inactive');
       self.$pause.removeClass().addClass('active');
@@ -151,7 +177,8 @@ var Crossing =  {
     var value = this.$select.val();
     this.NS.changeInterval(value);
     this.EW.changeInterval(value);
-    this.$form.fadeOut()
+    this.$start.fadeOut(100);
+    this.$reset.fadeIn(1000);
     this.play();
   },
 
@@ -159,28 +186,45 @@ var Crossing =  {
     this.$play.removeClass().addClass('inactive');
     this.$pause.removeClass().addClass('active');
     var self = this;
-    if (pause) {
-      pause = false;
-      return;
+    if (self.pauseStatus) {
+      self.pauseStatus = false;
+      return 'paused';
     }
 
-    if (played) {
-      return;
+    if (self.playStatus) {
+      return 'played';
     } else {
-      played = true;
+      self.playStatus = true;
       self.NS.playSchedule()
         .then(() => self.EW.playSchedule())
         .then(function(){
-          played = false;
+          self.playStatus = false;
           self.play()
         })
     }
   },
 
+  reset: function(e){
+    this.toggleMe(e);
+    var value = this.$select.val();
+    this.NS.changeInterval(value);
+    this.EW.changeInterval(value);
+
+    this.resetStatus = true;
+    console.log("reset");
+    this.NS.changeColor('red');
+    this.EW.changeColor('red');
+    this.playStatus = false;
+    this.pauseStatus = false;
+    this.play();
+    return 'reset';
+  },
+
   pause: function(){
-    console.log("paused");
-    pause = true;
-    played = false;
+    this.pauseStatus = true;
+    this.playStatus = false;
+    console.log('paused');
+    return 'paused';
   }
 
 };

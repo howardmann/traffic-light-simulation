@@ -1,9 +1,6 @@
-var pause = pause || false;
-var played = played || false;
-
 $(document).ready(function(){
   console.log("ready");
-  roadsModule.init();
+  Crossing.init();
 });
 
 

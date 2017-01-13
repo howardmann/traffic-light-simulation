@@ -11,10 +11,14 @@ button {
 }
 
 .road {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   border: 1px solid black;
   margin: 20px;
+  text-align: center;
+  float: left;
+  font-size: 20px;
+  border-radius: 10px;
 }
 
 .north-south, .east-west {
@@ -30,4 +34,13 @@ button {
   pointer-events: none;
   color: gainsboro;
   border-width: 0px;
+}
+
+.button-container {
+  display: block;
+  width: 100%;
+}
+
+#reset {
+  display: none;
 }

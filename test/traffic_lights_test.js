@@ -19,6 +19,7 @@ global.$ = require('jquery');
 var TrafficLight = require('../public/traffic_lights.js').TrafficLight;
 var timeHelper = require('../public/traffic_lights.js').timeHelper;
 var Crossing = require('../public/traffic_lights.js').Crossing;
+var pause = require('../public/traffic_lights.js').pause;
 var NS = Object.create(TrafficLight);
 
 
@@ -36,7 +37,7 @@ describe('TrafficLight', function() {
   });
 
   describe('init(string)', function() {
-    it('should set the TrafficLight name from string param', function(done) {
+    it('should set the TrafficLight name', function(done) {
         NS.init('North South');
         NS.name.should.equal('North South');
         done();
@@ -47,7 +48,7 @@ describe('TrafficLight', function() {
       NS.color.should.equal('red');
       done();
     });
-    it('should set the default interval as 300 secs (5 mins)', function(done) {
+    it('should set the default light changing interval as 300 secs (5 mins)', function(done) {
       NS.init('North South');
       NS.interval.should.equal(300);
       done();
@@ -63,7 +64,7 @@ describe('TrafficLight', function() {
   });
 
   describe('changeInterval(duration)', function(){
-    it('should set the interval from the duration param in seconds', function(done){
+    it('should set the interval from the given duration in seconds', function(done){
       NS.interval.should.equal(300);
       NS.changeInterval(120);
       NS.interval.should.equal(120);
@@ -81,16 +82,16 @@ describe('TrafficLight', function() {
     });
 
     it('should return a promise', function(done) {
-        NS.timer(1).should.be.a('promise');
-        this.clock.tick(1000);
-        done();
-      }),
+      NS.timer(1).should.be.a('promise');
+      this.clock.tick(1000);
+      done();
+    }),
 
-      it('should count down from duration params given as seconds down to zero in 1 second increments', function() {
-        var interval = NS.timer(300);
-        this.clock.tick(300000);
-        return interval.should.eventually.equal('end timer');
-      });
+    it('should count down from the given duration to zero in second intervals', function() {
+      var interval = NS.timer(300);
+      this.clock.tick(300000);
+      return interval.should.eventually.equal('end timer');
+    });
   });
 
   describe('switchRed()', function() {
@@ -108,7 +109,7 @@ describe('TrafficLight', function() {
       done();
     });
 
-    it('should change TrafficLight color to yellow for 5 seconds;', function() {
+    it('should change the TrafficLight color to yellow for 5 seconds;', function() {
       NS.switchRed();
       this.clock.tick(500);
       NS.color.should.equal('yellow');
@@ -191,7 +192,7 @@ describe('TrafficLight', function() {
         });
     });
 
-    it('should resolve after setTimeout of 1 sec', function() {
+    it('should eventually resolve promise', function() {
       var self = this;
       var interval = 300;
       var promise = new Promise(function(resolve) {
@@ -205,8 +206,7 @@ describe('TrafficLight', function() {
             self.clock.tick(5000);
           })
           .then(function() {
-            setTimeout(() => resolve('played'), 1000);
-            self.clock.tick(1000);
+            resolve('played');
           });
       })
       return expect(promise).to.have.been.fulfilled;
@@ -227,22 +227,26 @@ describe('timeHelper', function() {
     done();
   });
 
-  it('should return only mins when given full mins in seconds', function(done) {
-    var result = timeHelper(120);
-    result.should.equal('2 mins ');
-    done();
-  });
 });
 
 describe('Crossing', function() {
-  it('should initialize and instantiate two roads NS and EW with init()', function(done) {
+  beforeEach(function(){
     Crossing.init();
-    Crossing.NS.name.should.equal('north-south');
-    Crossing.EW.name.should.equal('east-west');
-    done();
+  });
+  describe('init()', function(){
+    it('should initialize and instantiate two roads NS and EW with init()', function(done) {
+      Crossing.NS.name.should.equal('north-south');
+      Crossing.EW.name.should.equal('east-west');
+      done();
+    });
+    it('should set up both pauseStatus and playStatus as false', function(done) {
+      Crossing.pauseStatus.should.equal(false);
+      Crossing.playStatus.should.equal(false);
+      done();
+    });
   });
 
-  describe('setInterval', function(){
+  describe('setInterval()', function(){
     it('should call toggleMe to prevent default when input tag is clicked', function(done){
       var div = document.createElement('input');
       var e = {
@@ -270,7 +274,6 @@ describe('Crossing', function() {
       var EWchangeInterval = sinon.spy(Crossing.EW, 'changeInterval');
       var e = {preventDefault: sinon.spy()};
       Crossing.setInterval(e);
-
       expect(NSchangeInterval.called).to.be.true;
       expect(EWchangeInterval.called).to.be.true;
       done();
@@ -283,8 +286,53 @@ describe('Crossing', function() {
       expect(play.called).to.be.true;
       done();
     });
+  });
 
+  describe('pause()', function(){
+    before(function() {
+      this.clock = sinon.useFakeTimers();
+    });
 
-  })
+    after(function() {
+      this.clock.restore();
+    });
+
+    it('should set pause property to true and played property as false ', function(done){
+      Crossing.pauseStatus.should.equal(false);
+      Crossing.pause();
+      Crossing.pauseStatus.should.equal(true);
+      Crossing.playStatus.should.equal(false);
+      Crossing.pause().should.equal('paused');
+      done();
+    });
+
+    it('should make TrafficLights NS and EW return pause when playSchedule() is called', function(done){
+      Crossing.pause();
+      Crossing.NS.playSchedule().should.equal('paused');
+      Crossing.EW.playSchedule().should.equal('paused');
+      done();
+    });
+
+    it('should make TrafficLights NS and EW return pause when timer() is called', function(){
+      Crossing.NS.pauseStatus.should.equal(false);
+      var promise = Crossing.NS.timer(3);
+      this.clock.tick(1000);
+      Crossing.pause();
+      this.clock.tick(2000);
+      Crossing.NS.pauseStatus.should.equal(true);
+    });
+  });
+
+  describe('play()', function(){
+    it('should return Crossing is paused or it is already currently playing');
+    it('should first call playSchedule for road NS and then call playSchedule for road EW');
+    it('should continue calling itself recursively unless Crossing is paused');
+  });
+
+  describe('reset()', function(){
+    it('should clear the timer interval');
+    it('should reset the time interval with selected interval');
+    it('should play traffic again');
+  });
 
 });
