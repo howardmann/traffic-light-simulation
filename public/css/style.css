@@ -16,3 +16,11 @@ button {
 .north-south, .east-west {
   background-color: red;
 }
+
+.active {
+  background-color: green;
+}
+.inactive {
+  background-color: gainsboro;
+  pointer-events: none;
+}

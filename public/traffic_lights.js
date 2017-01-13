@@ -1,6 +1,5 @@
 var pause = pause || false;
 var played = played || false;
-var reset = reset || false;
 
 var timeHelper = function(seconds){
   d = parseInt(seconds);
@@ -15,7 +14,7 @@ var TrafficLight = {
   init: function(name) {
     this.name = name;
     this.color = 'red';
-    this.interval = 3;
+    this.interval = 5;
     this.cacheDom();
   },
 
@@ -49,11 +48,6 @@ var TrafficLight = {
       var nextColor;
       var interval = setInterval(function() {
         if (pause) { return; }
-        if (reset) {
-          console.log("reset");
-          clearInterval(interval);
-          reset = false;
-        }
         console.log(`${color}: ${timeHelper(timeLeft)}`);
         timeLeft--;
 
@@ -127,62 +121,31 @@ var roadsModule =  {
   cacheDom: function(){
     this.$play = $('#traffic').find('#play');
     this.$pause = $('#traffic').find('#pause');
-    this.$submit = $('#traffic').find('input[type="submit"]');
-    this.$input = $('#traffic').find('select');
+    this.$button = $('#traffic').find('button');
   },
 
   bindEvents: function(){
+    var self = this;
     this.$play.on('click', this.play.bind(this));
     this.$pause.on('click', this.pause.bind(this));
-    this.$submit.on('click', this.reset.bind(this));
-  },
+    this.$play.on('click', function(){
+      $(this).removeClass().addClass('inactive');
+      self.$pause.removeClass().addClass('active');
+    });
+    this.$pause.on('click', function(){
+      $(this).removeClass().addClass('inactive');
+      self.$play.removeClass().addClass('active');
+    });
 
-  reset: function(e){
-    e.preventDefault();
-    this.NS.changeColor('red');
-    this.EW.changeColor('red');
+    // this.$pause.on('click', function(){
+    //   $(this).toggleClass('active inactive');
+    //   self.$play.toggleClass('inactive active');
+    // });
 
-    var value = parseInt(this.$input.val());
-
-    // clear timer and reset intervals
-    reset = true;
-    played = false;
-    pause = false;
-
-    this.NS.changeInterval(value);
-    this.EW.changeInterval(value);
-
-    // If already played reset before playing
-    // if (played) { reset = true;}
-    // if (!play){reset = true;}
-  },
-  updateInterval: function(){
-    var value = parseInt(this.$input.val());
-    console.log(value);
-    this.NS.changeInterval(value);
-    this.EW.changeInterval(value);
   },
 
   play: function(){
     var self = this;
-
-    // // Reset pause button
-    // if (pause) {
-    //   pause = false;
-    //   return;
-    // }
-    //
-    // if (!play) {
-    //   console.log("no double click");
-    //   return;
-    // } else {
-    //   play = false;
-    //   self.NS.playSchedule()
-    //     .then(() => self.EW.playSchedule())
-    //     .then(() => self.play());
-    // }
-
-    // If paused then set as false to resume play and return out of method (otherwise a new instance will run)
     if (pause) {
       pause = false;
       return;
@@ -191,7 +154,6 @@ var roadsModule =  {
     if (played) {
       return;
     } else {
-
       played = true;
       self.NS.playSchedule()
         .then(() => self.EW.playSchedule())
@@ -200,13 +162,11 @@ var roadsModule =  {
           self.play()
         })
     }
-
   },
 
   pause: function(){
     pause = true;
     played = false;
-    console.log("paused");
   }
 
 };
