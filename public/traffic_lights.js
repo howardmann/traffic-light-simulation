@@ -14,18 +14,18 @@ var TrafficLight = {
   init: function(name) {
     this.name = name;
     this.color = 'red';
-    this.interval = 5;
+    this.interval = 300;
     this.cacheDom();
   },
 
   cacheDom: function(){
-    // this.$name = $('#traffic').find("."+this.name);
-    // this.$timer = $('#timer');
+    this.$name = $('#traffic').find("."+this.name);
+    this.$timer = $('#timer');
   },
 
   renderDom: function() {
-    // this.$name.css({'backgroundColor': this.color});
-    // this.$name.html(this.color.toUpperCase());
+    this.$name.css({'backgroundColor': this.color});
+    this.$name.html(this.color.toUpperCase());
   },
 
   changeColor: function(color) {
@@ -114,8 +114,8 @@ var Crossing =  {
     this.NS.init('north-south');
     this.EW = Object.create(TrafficLight);
     this.EW.init('east-west');
-    // this.cacheDom();
-    // this.bindEvents();
+    this.cacheDom();
+    this.bindEvents();
   },
 
   cacheDom: function(){
@@ -142,8 +142,12 @@ var Crossing =  {
     });
   },
 
-  setInterval: function(e){
+  toggleMe: function(e){
     e.preventDefault();
+  },
+
+  setInterval: function(e){
+    this.toggleMe(e);
     var value = this.$select.val();
     this.NS.changeInterval(value);
     this.EW.changeInterval(value);
