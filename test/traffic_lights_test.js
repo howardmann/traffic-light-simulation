@@ -52,7 +52,7 @@ describe('TrafficLight', function(){
       NS.init('North South');
     }),
 
-    it('should set the TrafficLight name as string param', function(done){
+    it('should set the TrafficLight name from string param', function(done){
       NS.name.should.equal('North South');
       done();
     }),
@@ -64,7 +64,7 @@ describe('TrafficLight', function(){
   });
 
   describe('changeColor(string)', function(){
-    it('should set the desired color as string param', function(done){
+    it('should set the TrafficLight color from string param', function(done){
       NS.changeColor('red');
       NS.color.should.equal('red');
       done();
@@ -86,7 +86,7 @@ describe('TrafficLight', function(){
       done();
     }),
 
-    it('should count down from 5 minutes to zero',function(){
+    it('should count down from duration params given as seconds down to zero in 1 second increments',function(){
       var interval = NS.timer(300);
       this.clock.tick(300000);
       return interval.should.eventually.equal('end timer');
@@ -108,7 +108,7 @@ describe('TrafficLight', function(){
       done();
     });
 
-    it('should change to yellow for 5 seconds;', function(){
+    it('should change TrafficLight color to yellow for 5 seconds;', function(){
       NS.switchRed();
       this.clock.tick(500);
       NS.color.should.equal('yellow');
@@ -119,7 +119,7 @@ describe('TrafficLight', function(){
       this.clock.tick(5000);
     });
 
-    it("should then change red;", function(done){
+    it("should then change TrafficLight color to red after 5 seconds;", function(done){
       NS.color.should.equal('red');
       done();
     });
@@ -131,7 +131,7 @@ describe('TrafficLight', function(){
       done();
     });
 
-    it('should call changeColor("green")', function(done){
+    it('should call method changeColor("green")', function(done){
       var changeColor = sinon.spy(NS, 'changeColor');
       NS.switchGreen();
       (changeColor.called).should.be.true;
@@ -154,7 +154,7 @@ describe('TrafficLight', function(){
       done();
     });
 
-    it('should call switchGreen()', function(done){
+    it('should call method switchGreen()', function(done){
       var switchGreen = sinon.spy(NS, 'switchGreen');
       NS.playSchedule();
       (switchGreen.called).should.be.true;
@@ -162,7 +162,7 @@ describe('TrafficLight', function(){
       done();
     });
 
-    it('should stay green for 5 minutes by calling timer(300)', function() {
+    it('should stay green for 5 minutes by calling method timer(300)', function() {
       var self = this;
       var interval = 300;
 
@@ -175,7 +175,7 @@ describe('TrafficLight', function(){
       NS.color.should.equal('green');
     });
 
-    it('should then turn yellow first by by calling switchRed()', function(){
+    it('should then turn yellow first by by calling method switchRed()', function(){
       var self = this;
       var interval = 300;
       var switchRed = sinon.spy(NS, 'switchRed');
@@ -211,10 +211,7 @@ describe('TrafficLight', function(){
       })
       return expect(promise).to.have.been.fulfilled;
     });
-
-
   });
-
 });
 
 describe('timeHelper', function(){

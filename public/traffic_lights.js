@@ -28,7 +28,7 @@ var TrafficLight = {
 
   changeColor: function(color) {
     this.color = color;
-    console.log(`${this.name} changed ${this.color}`);
+    // console.log(`${this.name} changed ${this.color}`);
     this.renderDom();
   },
 
@@ -40,7 +40,7 @@ var TrafficLight = {
       var timeLeft = seconds;
       var formatTime;
       var nextColor;
-      console.log(`${color}: ${timeHelper(timeLeft)}`);
+      // console.log(`${color}: ${timeHelper(timeLeft)}`);
       var interval = setInterval(function() {
         if (pause) {
           return;
@@ -56,7 +56,7 @@ var TrafficLight = {
         //   $name.html(formatMsg);
         // }
 
-        console.log(`${color}: ${timeHelper(timeLeft)}`);
+        // console.log(`${color}: ${timeHelper(timeLeft)}`);
 
         if (timeLeft <= 0) {
           clearInterval(interval);
