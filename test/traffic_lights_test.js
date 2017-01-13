@@ -6,8 +6,8 @@ var sinon = require('sinon');
 var chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 
-// var jsdom = require('jsdom');
-// var fs = require('fs');
+var jsdom = require('jsdom');
+var fs = require('fs');
 
 // describe('Traffic Lights', function(){
 //   var html = fs.readFileSync(__dirname + '/../public/index.html', 'utf8');
@@ -31,8 +31,9 @@ chai.use(chaiAsPromised);
 
 
 var TrafficLight = require('../public/traffic_lights.js').TrafficLight;
-var NS = Object.create(TrafficLight);
 var timeHelper = require('../public/traffic_lights.js').timeHelper;
+var Crossing = require('../public/traffic_lights.js').Crossing;
+var NS = Object.create(TrafficLight);
 
 describe('TrafficLight', function(){
   describe('Object.create(TrafficLight)', function(){
@@ -232,4 +233,15 @@ describe('timeHelper', function(){
     result.should.equal('2 mins ');
     done();
   });
+});
+
+describe('Crossing', function(){
+  it('should initialize and instantiate two roads NS and EW with init()', function(done){
+    Crossing.init();
+    Crossing.NS.name.should.equal('north-south');
+    Crossing.EW.name.should.equal('east-west');
+
+    done();
+  });
+
 });

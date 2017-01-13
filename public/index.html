@@ -10,9 +10,19 @@
 <body>
   <div id="traffic">
     <h1>Traffic Lights</h1>
-    <p>Lights change: <span id="timer"></span></p>
-    <button id="play" class="active">PLAY</button>
-    <button id="pause" class="active">PAUSE</button>
+    <form>
+      <p>Select time interval for traffic light change</p>
+      <select>
+        <option value="300">5 mins</option>
+        <option value="120">2 mins</option>
+        <option value="60">1 min</option>
+        <option value="30">30 sec</option>
+        <option value="5">5 sec</option>
+      </select>
+      <input type="submit" value="SELECT">
+    </form>
+    <button id="play" class="inactive">PLAY</button>
+    <button id="pause" class="inactive">PAUSE</button>
 
     <div>
       <p>North South</p>

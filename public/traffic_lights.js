@@ -19,24 +19,24 @@ var TrafficLight = {
   },
 
   cacheDom: function(){
-    this.$name = $('#traffic').find("."+this.name);
-    this.$timer = $('#timer');
+    // this.$name = $('#traffic').find("."+this.name);
+    // this.$timer = $('#timer');
   },
 
   renderDom: function() {
-    this.$name.css({'backgroundColor': this.color});
-    this.$name.html(this.color.toUpperCase());
+    // this.$name.css({'backgroundColor': this.color});
+    // this.$name.html(this.color.toUpperCase());
   },
 
   changeColor: function(color) {
     this.color = color;
-    console.log(`${this.name} changed ${this.color}`);
+    // console.log(`${this.name} changed ${this.color}`);
     this.renderDom();
   },
 
   changeInterval: function(seconds) {
     this.interval = seconds;
-    console.log('Updated interval', this.interval);
+    // console.log('Updated interval', this.interval);
   },
 
   timer: function(seconds) {
@@ -48,7 +48,7 @@ var TrafficLight = {
       var nextColor;
       var interval = setInterval(function() {
         if (pause) { return; }
-        console.log(`${color}: ${timeHelper(timeLeft)}`);
+        // console.log(`${color}: ${timeHelper(timeLeft)}`);
         timeLeft--;
 
         // // Render message
@@ -108,26 +108,30 @@ var TrafficLight = {
   }
 };
 
-var roadsModule =  {
+var Crossing =  {
   init: function(roadA, roadB) {
     this.NS = Object.create(TrafficLight);
     this.NS.init('north-south');
     this.EW = Object.create(TrafficLight);
     this.EW.init('east-west');
-    this.cacheDom();
-    this.bindEvents();
+    // this.cacheDom();
+    // this.bindEvents();
   },
 
   cacheDom: function(){
     this.$play = $('#traffic').find('#play');
     this.$pause = $('#traffic').find('#pause');
     this.$button = $('#traffic').find('button');
+    this.$select = $('#traffic').find('select');
+    this.$submit = $('#traffic').find('input[type="submit"]');
+    this.$form = $('#traffic').find('form');
   },
 
   bindEvents: function(){
     var self = this;
     this.$play.on('click', this.play.bind(this));
     this.$pause.on('click', this.pause.bind(this));
+    this.$submit.on('click', this.setInterval.bind(this))
     this.$play.on('click', function(){
       $(this).removeClass().addClass('inactive');
       self.$pause.removeClass().addClass('active');
@@ -136,15 +140,20 @@ var roadsModule =  {
       $(this).removeClass().addClass('inactive');
       self.$play.removeClass().addClass('active');
     });
+  },
 
-    // this.$pause.on('click', function(){
-    //   $(this).toggleClass('active inactive');
-    //   self.$play.toggleClass('inactive active');
-    // });
-
+  setInterval: function(e){
+    e.preventDefault();
+    var value = this.$select.val();
+    this.NS.changeInterval(value);
+    this.EW.changeInterval(value);
+    this.$form.fadeOut()
+    this.play();
   },
 
   play: function(){
+    this.$play.removeClass().addClass('inactive');
+    this.$pause.removeClass().addClass('active');
     var self = this;
     if (pause) {
       pause = false;
@@ -165,10 +174,11 @@ var roadsModule =  {
   },
 
   pause: function(){
+    console.log("paused");
     pause = true;
     played = false;
   }
 
 };
 
-module.exports = {TrafficLight, timeHelper};
+module.exports = {TrafficLight, timeHelper, Crossing};

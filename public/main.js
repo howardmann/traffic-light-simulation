@@ -1,3 +1,13 @@
+var pause = pause || false;
+var played = played || false;
+
+$(document).ready(function(){
+  console.log("ready");
+  roadsModule.init();
+});
+
+
+
 // // Traffic lights at intersection
 // var TrafficLight = {
 //   init: function(name){
@@ -148,8 +158,3 @@
 //   pause = true;
 //   console.log('traffic paused');
 // };
-
-$(document).ready(function(){
-  console.log("ready");
-  roadsModule.init();
-});

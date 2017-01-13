@@ -1,9 +1,13 @@
+body {
+  padding: 0% 2%;
+}
 button {
   font-size: 20px;
   margin: 20px;
   padding: 20px;
   width: 150px;
   cursor: pointer;
+  outline: none;
 }
 
 .road {
@@ -18,9 +22,12 @@ button {
 }
 
 .active {
-  background-color: green;
+  background-color: lightslategrey;
+  color: white;
 }
 .inactive {
-  background-color: gainsboro;
+  background-color: ghostwhite;
   pointer-events: none;
+  color: gainsboro;
+  border-width: 0px;
 }
