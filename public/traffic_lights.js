@@ -97,6 +97,7 @@ var TrafficLight = {
 
   playSchedule: function(){
     if (pause) { return;};
+
     var switchRed = this.switchRed.bind(this);
     var switchGreen = this.switchGreen.bind(this);
     var timer = this.timer.bind(this);
@@ -133,30 +134,34 @@ var roadsModule =  {
   bindEvents: function(){
     this.$play.on('click', this.play.bind(this));
     this.$pause.on('click', this.pause.bind(this));
-    // this.$submit.on('click', this.reset.bind(this));
+    this.$submit.on('click', this.reset.bind(this));
   },
 
-  // reset: function(e){
-  //   e.preventDefault();
-  //   this.NS.changeColor('red');
-  //   this.EW.changeColor('red');
-  //   console.log('comme');
-  //
-  //   var value = parseInt(this.$input.val());
-  //   this.NS.changeInterval(value);
-  //   this.EW.changeInterval(value);
-  //
-  //   if (!play){reset = true;}
-  //   play = true;
-  //   pause = false;
-  //   this.play();
-  // },
-  // updateInterval: function(){
-  //   var value = parseInt(this.$input.val());
-  //   console.log(value);
-  //   this.NS.changeInterval(value);
-  //   this.EW.changeInterval(value);
-  // },
+  reset: function(e){
+    e.preventDefault();
+    this.NS.changeColor('red');
+    this.EW.changeColor('red');
+
+    var value = parseInt(this.$input.val());
+
+    // clear timer and reset intervals
+    reset = true;
+    played = false;
+    pause = false;
+
+    this.NS.changeInterval(value);
+    this.EW.changeInterval(value);
+
+    // If already played reset before playing
+    // if (played) { reset = true;}
+    // if (!play){reset = true;}
+  },
+  updateInterval: function(){
+    var value = parseInt(this.$input.val());
+    console.log(value);
+    this.NS.changeInterval(value);
+    this.EW.changeInterval(value);
+  },
 
   play: function(){
     var self = this;
@@ -177,12 +182,16 @@ var roadsModule =  {
     //     .then(() => self.play());
     // }
 
-    // If paused then set true and play
-    if (pause) { pause = false;}
+    // If paused then set as false to resume play and return out of method (otherwise a new instance will run)
+    if (pause) {
+      pause = false;
+      return;
+    }
 
     if (played) {
       return;
     } else {
+
       played = true;
       self.NS.playSchedule()
         .then(() => self.EW.playSchedule())
@@ -196,6 +205,7 @@ var roadsModule =  {
 
   pause: function(){
     pause = true;
+    played = false;
     console.log("paused");
   }
 
