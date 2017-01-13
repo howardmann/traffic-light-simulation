@@ -1,5 +1,6 @@
 var pause = pause || false;
-var play = play || true;
+var played = played || false;
+var reset = reset || false;
 
 var timeHelper = function(seconds){
   d = parseInt(seconds);
@@ -14,7 +15,7 @@ var TrafficLight = {
   init: function(name) {
     this.name = name;
     this.color = 'red';
-    this.interval = 300;
+    this.interval = 3;
     this.cacheDom();
   },
 
@@ -48,6 +49,11 @@ var TrafficLight = {
       var nextColor;
       var interval = setInterval(function() {
         if (pause) { return; }
+        if (reset) {
+          console.log("reset");
+          clearInterval(interval);
+          reset = false;
+        }
         console.log(`${color}: ${timeHelper(timeLeft)}`);
         timeLeft--;
 
@@ -90,6 +96,7 @@ var TrafficLight = {
   },
 
   playSchedule: function(){
+    if (pause) { return;};
     var switchRed = this.switchRed.bind(this);
     var switchGreen = this.switchGreen.bind(this);
     var timer = this.timer.bind(this);
@@ -112,7 +119,6 @@ var roadsModule =  {
     this.NS.init('north-south');
     this.EW = Object.create(TrafficLight);
     this.EW.init('east-west');
-    this.playClick = 0;
     this.cacheDom();
     this.bindEvents();
   },
@@ -127,9 +133,24 @@ var roadsModule =  {
   bindEvents: function(){
     this.$play.on('click', this.play.bind(this));
     this.$pause.on('click', this.pause.bind(this));
-    // this.$submit.on('click', this.updateInterval.bind(this));
+    // this.$submit.on('click', this.reset.bind(this));
   },
 
+  // reset: function(e){
+  //   e.preventDefault();
+  //   this.NS.changeColor('red');
+  //   this.EW.changeColor('red');
+  //   console.log('comme');
+  //
+  //   var value = parseInt(this.$input.val());
+  //   this.NS.changeInterval(value);
+  //   this.EW.changeInterval(value);
+  //
+  //   if (!play){reset = true;}
+  //   play = true;
+  //   pause = false;
+  //   this.play();
+  // },
   // updateInterval: function(){
   //   var value = parseInt(this.$input.val());
   //   console.log(value);
@@ -140,20 +161,35 @@ var roadsModule =  {
   play: function(){
     var self = this;
 
-    // Reset pause button
-    if (pause) {
-      pause = false;
-      return;
-    }
+    // // Reset pause button
+    // if (pause) {
+    //   pause = false;
+    //   return;
+    // }
+    //
+    // if (!play) {
+    //   console.log("no double click");
+    //   return;
+    // } else {
+    //   play = false;
+    //   self.NS.playSchedule()
+    //     .then(() => self.EW.playSchedule())
+    //     .then(() => self.play());
+    // }
 
-    if (!play) {
-      console.log("no double click");
+    // If paused then set true and play
+    if (pause) { pause = false;}
+
+    if (played) {
       return;
     } else {
-      play = false;
+      played = true;
       self.NS.playSchedule()
         .then(() => self.EW.playSchedule())
-        .then(() => self.play());
+        .then(function(){
+          played = false;
+          self.play()
+        })
     }
 
   },
