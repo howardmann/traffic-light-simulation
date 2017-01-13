@@ -118,33 +118,38 @@
 // };
 
 // jQuery interaction code
+// $(document).ready(function(){
+//   console.log("ready");
+//   $('#play').on('click', startTraffic);
+//   $('#pause').on('click', pauseTraffic);
+// });
+
+// var pause = pause || false;
+//
+// var NS = Object.create(TrafficLight);
+// NS.init('north-south');
+//
+// var EW = Object.create(TrafficLight);
+// EW.init('east-west');
+//
+// var startTraffic = function(){
+//   if (pause) {
+//     pause = false;
+//     return;
+//   }
+//
+//   NS.playSchedule()
+//     .then(() => EW.playSchedule())
+//     .then(() => startTraffic());
+// };
+//
+// // Call pause
+// var pauseTraffic = function(){
+//   pause = true;
+//   console.log('traffic paused');
+// };
+
 $(document).ready(function(){
   console.log("ready");
-  $('#play').on('click', startTraffic);
-  $('#pause').on('click', pauseTraffic);
+  roadsModule.init();
 });
-
-var pause = pause || false;
-
-var NS = Object.create(TrafficLight);
-NS.init('north-south');
-
-var EW = Object.create(TrafficLight);
-EW.init('east-west');
-
-var startTraffic = function(){
-  if (pause) {
-    pause = false;
-    return;
-  }
-
-  NS.playSchedule()
-    .then(() => EW.playSchedule())
-    .then(() => startTraffic());
-};
-
-// Call pause
-var pauseTraffic = function(){
-  pause = true;
-  console.log('traffic paused');
-};
