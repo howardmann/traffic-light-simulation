@@ -1,5 +1,6 @@
 var chai = require('chai');
 var should = chai.should();
+var expect = chai.expect;
 var sinon = require('sinon');
 
 var chaiAsPromised = require('chai-as-promised');
@@ -161,9 +162,56 @@ describe('TrafficLight', function(){
       done();
     });
 
-    it('should should stay green for 5 mins with timer(300)');
-    it('should should turn yellow then red after 5 mins with switchRed()');
-    it('should stay red for 5 mins with timer(300)');
+    it('should stay green for 5 minutes by calling timer(300)', function() {
+      var self = this;
+      var interval = 300;
+
+      NS.switchGreen()
+        .then(function(){
+          NS.timer(interval);
+          self.clock.tick(interval * 1000);
+        });
+
+      NS.color.should.equal('green');
+    });
+
+    it('should then turn yellow first by by calling switchRed()', function(){
+      var self = this;
+      var interval = 300;
+      var switchRed = sinon.spy(NS, 'switchRed');
+
+      NS.switchGreen()
+        .then(function(){
+          NS.timer(interval);
+          self.clock.tick(interval * 1000);
+        })
+        .then(function(){
+          NS.switchRed();
+          expect(switchRed.called).to.be.true;
+        });
+    });
+
+    it('should resolve after setTimeout of 1 sec', function(){
+      var self = this;
+      var interval = 300;
+      var promise = new Promise(function(resolve){
+        NS.switchGreen()
+          .then(function(){
+            NS.timer(interval);
+            self.clock.tick(interval * 1000);
+          })
+          .then(function(){
+            NS.switchRed();
+            self.clock.tick(5000);
+          })
+          .then(function(){
+            setTimeout(() => resolve('played'), 1000);
+            self.clock.tick(1000);
+          });
+      })
+      return expect(promise).to.have.been.fulfilled;
+    });
+
 
   });
 

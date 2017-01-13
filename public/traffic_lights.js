@@ -13,16 +13,23 @@ var TrafficLight = {
   init: function(name) {
     this.name = name;
     this.color = 'red';
-    this.$name = $('#traffic').find("."+this.name);
-    this.$timer = $('#timer');
+    this.cacheDom();
+  },
+
+  cacheDom: function(){
+  //   this.$name = $('#traffic').find("."+this.name);
+  //   this.$timer = $('#timer');
+  },
+
+  renderDom: function() {
+    // this.$name.css({'backgroundColor': this.color});
+    // this.$name.html(this.color.toUpperCase());
   },
 
   changeColor: function(color) {
     this.color = color;
-    this.$name.css({'backgroundColor': this.color});
     console.log(`${this.name} changed ${this.color}`);
-    if (this.color === 'green') {this.$name.html('GO')};
-    if (this.color === 'red') {this.$name.html('STOP')};
+    this.renderDom();
   },
 
   timer: function(seconds) {
@@ -39,13 +46,15 @@ var TrafficLight = {
           return;
         }
         timeLeft--;
-        if (color === 'green') {
-          formatMsg = timeHelper(timeLeft + 5) + ' until STOP';
-          $name.html(formatMsg);
-        } else {
-          formatMsg = timeHelper(timeLeft) + ' until STOP';
-          $name.html(formatMsg);
-        }
+
+        // // Render message
+        // if (color === 'green') {
+        //   formatMsg = timeHelper(timeLeft + 5) + ' until STOP';
+        //   $name.html(formatMsg);
+        // } else {
+        //   formatMsg = timeHelper(timeLeft) + ' until STOP';
+        //   $name.html(formatMsg);
+        // }
 
         console.log(`${color}: ${timeHelper(timeLeft)}`);
 
@@ -89,7 +98,7 @@ var TrafficLight = {
         .then(() => timer(interval))
         .then(() => switchRed())
         .then(function(){
-          setTimeout(resolve(),1000);
+          setTimeout(()=> resolve('played'),1000);
         })
     });
   }
