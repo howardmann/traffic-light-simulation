@@ -12,9 +12,9 @@ Summary instructions below:
 3. Click PAUSE to pause animation and click PLAY button to resume
 4. Click RESET to reset animation after you SELECT a new time interval
 
-[Click this link for a live online demo](http://trafficlightsimulation.surge.sh/)
+[Click this link or image below for a live online demo](http://trafficlightsimulation.surge.sh/)
 
-![traffic light screenshot][image]
+[![traffic light screenshot][image]](http://trafficlightsimulation.surge.sh/)
 
 [image]: https://github.com/howardmann/traffic-light-simulation/blob/master/trafficlightscreen.png "Traffic light simulation"
 
