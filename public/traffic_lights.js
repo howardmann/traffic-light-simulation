@@ -66,9 +66,7 @@ var TrafficLight = {
         if (Crossing.resetStatus) {
           Crossing.resetStatus = false;
           clearInterval(interval);
-          console.log(self.countDown);
           return;
-          // return Promise.reject('timer reset').catch(e => console.log(e));
         }
         timeLeft--;
         self.countDown = timeLeft;
