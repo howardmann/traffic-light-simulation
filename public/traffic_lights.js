@@ -58,12 +58,13 @@ var TrafficLight = {
 
   timer: function(seconds) {
     var self = this;
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
       var timeLeft = seconds;
 
       var interval = setInterval(function() {
         if (Crossing.pauseStatus) {
           self.pauseStatus = true;
+          reject('interval paused');
           return;
         } else {
           self.pauseStatus = false;
@@ -72,9 +73,9 @@ var TrafficLight = {
         if (Crossing.resetStatus) {
           Crossing.resetStatus = false;
           clearInterval(interval);
+          reject('timer reset');
           return;
         }
-
         timeLeft--;
         self.countDown = timeLeft;
         self.renderTimer();
@@ -168,10 +169,6 @@ var Crossing =  {
     });
   },
 
-  toggleMe: function(e){
-    e.preventDefault();
-  },
-
   setInterval: function(e){
     this.toggleMe(e);
     var value = this.$select.val();
@@ -180,6 +177,16 @@ var Crossing =  {
     this.$start.fadeOut(100);
     this.$reset.fadeIn(1000);
     this.play();
+  },
+
+  toggleMe: function(e){
+    e.preventDefault();
+  },
+
+  pause: function(){
+    this.pauseStatus = true;
+    this.playStatus = false;
+    return 'paused';
   },
 
   play: function(){
@@ -196,7 +203,9 @@ var Crossing =  {
     } else {
       self.playStatus = true;
       self.NS.playSchedule()
-        .then(() => self.EW.playSchedule())
+        .then(function(){
+          self.EW.playSchedule()
+        })
         .then(function(){
           self.playStatus = false;
           self.play()
@@ -218,15 +227,7 @@ var Crossing =  {
     this.pauseStatus = false;
     this.play();
     return 'reset';
-  },
-
-  pause: function(){
-    this.pauseStatus = true;
-    this.playStatus = false;
-    console.log('paused');
-    return 'paused';
   }
-
 };
 
 module.exports = {TrafficLight, timeHelper, Crossing};
