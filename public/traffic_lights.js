@@ -220,7 +220,6 @@ var Crossing =  {
     this.EW.changeInterval(value);
 
     this.resetStatus = true;
-    console.log("reset");
     this.NS.changeColor('red');
     this.EW.changeColor('red');
     this.playStatus = false;

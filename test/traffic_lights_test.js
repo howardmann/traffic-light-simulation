@@ -92,6 +92,7 @@ describe('TrafficLight', function() {
       this.clock.tick(300000);
       return interval.should.eventually.equal('end timer');
     });
+
   });
 
   describe('switchRed()', function() {
@@ -282,48 +283,6 @@ describe('Crossing', function() {
     });
   });
 
-  describe('setInterval()', function(){
-    it('should prevent default when input tag is clicked', function(done){
-      var div = document.createElement('input');
-      var e = {
-        target: div,
-        preventDefault: sinon.spy()
-      };
-      Crossing.toggleMe(e);
-      expect(e.preventDefault.called).to.be.true;
-      done();
-    });
-
-    it('should capture the duration time interval from the html select form', function(done){
-      chai.request(server)
-        .get('/')
-        .end(function(err, res) {
-          var $ = cheerio.load(res.text);
-          var value = ($('select option').eq(1).val());
-          value.should.equal('120');
-          done();
-        })
-    });
-
-    it('should change the duration interval for both NS and EW TrafficLights', function(done){
-      var NSchangeInterval = sinon.spy(Crossing.NS, 'changeInterval');
-      var EWchangeInterval = sinon.spy(Crossing.EW, 'changeInterval');
-      var e = {preventDefault: sinon.spy()};
-      Crossing.setInterval(e);
-      expect(NSchangeInterval.called).to.be.true;
-      expect(EWchangeInterval.called).to.be.true;
-      done();
-    });
-
-    it('should finally call play() to start the traffic animation', function(done){
-      var play = sinon.spy(Crossing, 'play');
-      var e = {preventDefault: sinon.spy()};
-      Crossing.setInterval(e);
-      expect(play.called).to.be.true;
-      done();
-    });
-  });
-
   describe('play()', function(){
     before(function() {
       this.clock = sinon.useFakeTimers();
@@ -364,7 +323,7 @@ describe('Crossing', function() {
         })
     });
 
-    it('should keep calling itself in a loop');
+    it('should keep playing itself in a loop recursively');
 
   });
 
@@ -377,23 +336,87 @@ describe('Crossing', function() {
       this.clock.restore();
     });
 
-    it('should stop the timer from counting down', function(){
+    it('should reset the TrafficLight timer', function(){
+      var e = {preventDefault: sinon.spy()};
       var promise = Crossing.NS.timer(5);
       this.clock.tick(2000);
-      Crossing.resetStatus = true;
-      // var e = {preventDefault: sinon.spy()};
-      // Crossing.reset(e);
+      Crossing.reset(e);
       this.clock.tick(2000);
       return promise.should.be.rejectedWith('timer reset');
     });
-    
-    it('should reset the time interval with selected interval');
-    it('should play traffic again');
+
+    it('should change the TrafficLight colors to red', function(done){
+      var NSchangeColor = sinon.spy(Crossing.NS, 'changeColor');
+      var EWchangeColor = sinon.spy(Crossing.EW, 'changeColor');
+      var e = {preventDefault: sinon.spy()};
+      Crossing.reset(e);
+      expect(NSchangeColor.called).to.be.true;
+      expect(EWchangeColor.called).to.be.true;
+      done();
+    })
+
+    it('should update the time interval for NS and EW TrafficLights', function(done){
+      var NSchangeInterval = sinon.spy(Crossing.NS, 'changeInterval');
+      var EWchangeInterval = sinon.spy(Crossing.EW, 'changeInterval');
+      var e = {preventDefault: sinon.spy()};
+      Crossing.reset(e);
+      expect(NSchangeInterval.called).to.be.true;
+      expect(EWchangeInterval.called).to.be.true;
+      done();
+    });
+
+    it('should then play traffic', function(done){
+      var play = sinon.spy(Crossing, 'play');
+      var e = {preventDefault: sinon.spy()};
+      Crossing.reset(e);
+      expect(play.called).to.be.true;
+      play.restore();
+      done();
+    });
   });
 
+  describe('setInterval()', function(){
+    it('should prevent default when input tag is clicked', function(done){
+      var div = document.createElement('input');
+      var e = {
+        target: div,
+        preventDefault: sinon.spy()
+      };
+      Crossing.toggleMe(e);
+      expect(e.preventDefault.called).to.be.true;
+      done();
+    });
+
+    it('should capture the duration time interval from the html select form', function(done){
+      chai.request(server)
+        .get('/')
+        .end(function(err, res) {
+          var $ = cheerio.load(res.text);
+          var value = ($('select option').eq(1).val());
+          value.should.equal('120');
+          done();
+        })
+    });
+
+    it('should change the duration interval for both NS and EW TrafficLights', function(done){
+      var NSchangeInterval = sinon.spy(Crossing.NS, 'changeInterval');
+      var EWchangeInterval = sinon.spy(Crossing.EW, 'changeInterval');
+      var e = {preventDefault: sinon.spy()};
+      Crossing.setInterval(e);
+      expect(NSchangeInterval.called).to.be.true;
+      expect(EWchangeInterval.called).to.be.true;
+      done();
+    });
+
+    it('should finally call play() to start the traffic animation', function(done){
+      var play = sinon.spy(Crossing, 'play');
+      var e = {preventDefault: sinon.spy()};
+      Crossing.setInterval(e);
+      expect(play.called).to.be.true;
+      play.restore();
+      done();
+    });
+  });
+
+
 });
-
-
-// var interval = NS.timer(300);
-// this.clock.tick(300000);
-// return interval.should.eventually.equal('end timer');
