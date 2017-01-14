@@ -28,6 +28,13 @@ npm start
 
 Open your browser and enter the following url `http://localhost:3000`
 
+Run unit tests with `npm test`
+
+![mocha tests][test]
+
+[test]: https://github.com/howardmann/traffic-light-simulation/blob/master/traffictest.png "mocha tests"
+
+
 ## Tech stack
 - **Language**: JavaScript for application logic
 - **Server**: Express.js for simple server
@@ -35,4 +42,4 @@ Open your browser and enter the following url `http://localhost:3000`
 - **DOM**: HTML, CSS and jQuery for DOM rendering
 
 ## Author
-[Howie Mann](http://www.howiemann.tech)
+[Howie Mann (2017)](http://www.howiemann.tech)
