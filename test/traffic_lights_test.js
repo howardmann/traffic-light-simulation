@@ -19,7 +19,6 @@ global.$ = require('jquery');
 var TrafficLight = require('../public/traffic_lights.js').TrafficLight;
 var timeHelper = require('../public/traffic_lights.js').timeHelper;
 var Crossing = require('../public/traffic_lights.js').Crossing;
-var pause = require('../public/traffic_lights.js').pause;
 var NS = Object.create(TrafficLight);
 
 describe('TrafficLight', function() {
@@ -264,14 +263,14 @@ describe('Crossing', function() {
       done();
     });
 
-    it('should pause the timer function by rejecting the promise', function(){
-      Crossing.pauseStatus.should.equal(false);
+    it('should pause the timer countdown when called', function(){
       var promise = Crossing.NS.timer(3);
       this.clock.tick(1000);
       Crossing.pause();
+      Crossing.NS.countDown.should.equal(2);
+      this.clock.tick(3000);
+      Crossing.NS.countDown.should.equal(2);
       Crossing.pauseStatus.should.equal(true);
-      this.clock.tick(2000);
-      return promise.should.be.rejectedWith('interval paused');
     });
 
     it('should pause the playSchedule function by returning', function(done){
@@ -304,14 +303,23 @@ describe('Crossing', function() {
       Crossing.play().should.equal('played');
     });
 
+    it('should resume the timer countdown after play() is called', function(){
+      var promise = Crossing.NS.timer(3);
+      this.clock.tick(1000);
+      Crossing.pause();
+      Crossing.NS.countDown.should.equal(2);
+      this.clock.tick(3000);
+      Crossing.play();
+      this.clock.tick(2000);
+      return promise.should.eventually.equal('end timer');
+    });
+
     it('should play the NS TrafficLight schedule first', function(done){
       var NSplaySchedule = sinon.spy(Crossing.NS, 'playSchedule');
       Crossing.play();
       expect(NSplaySchedule.called).to.be.true;
       done();
     });
-
-    it('should keep playing itself in a loop recursively');
 
   });
 

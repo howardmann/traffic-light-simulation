@@ -12,7 +12,6 @@ var TrafficLight = {
     this.name = name;
     this.color = 'red';
     this.interval = 300;
-    this.pauseStatus = false;
     this.countDown = this.countDown || (this.interval - 5);
     this.cacheDom();
   },
@@ -60,26 +59,18 @@ var TrafficLight = {
     var self = this;
     return new Promise(function(resolve, reject) {
       var timeLeft = seconds;
-
       var interval = setInterval(function() {
         if (Crossing.pauseStatus) {
-          self.pauseStatus = true;
-          reject('interval paused');
-          return;
-        } else {
-          self.pauseStatus = false;
+          return Promise.reject('interval paused').catch(e => console.log(e));
         }
-
         if (Crossing.resetStatus) {
           Crossing.resetStatus = false;
           clearInterval(interval);
-          reject('timer reset');
-          return;
+          return Promise.reject('timer reset').catch(e => console.log(e));
         }
         timeLeft--;
         self.countDown = timeLeft;
         self.renderTimer();
-        // console.log(timeLeft, self.name, self.color);
 
         if (timeLeft <= 0) {
           clearInterval(interval);
@@ -116,11 +107,10 @@ var TrafficLight = {
 
     // Pause condition
     if (Crossing.pauseStatus) {
-      self.pauseStatus = true;
       return 'paused';
     };
 
-    // Play script, start green, stay green for interval duration, switch to yellow for 5 seconds, switch Red and then resolve after 1 second for traffic safety buffer
+    // Play script, start green, stay green for interval duration, switch to yellow for 5 seconds, switch Red and then resolve
     return new Promise(function(resolve){
       self.switchGreen()
         .then(() => self.timer(interval))
