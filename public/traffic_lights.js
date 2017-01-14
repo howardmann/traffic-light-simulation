@@ -78,6 +78,7 @@ var TrafficLight = {
         }
         timeLeft--;
         self.countDown = timeLeft;
+        console.log(self.countDown, self.name);
         self.renderTimer();
 
         if (timeLeft <= 0) {
@@ -208,7 +209,7 @@ var Crossing =  {
         })
         .then(function(){
           self.playStatus = false;
-          self.play()
+          self.play();
         })
     }
   },

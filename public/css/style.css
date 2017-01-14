@@ -1,5 +1,22 @@
 body {
   padding: 0% 2%;
+  font-family: 'arial';
+}
+form, select, input{
+  font-size: 20px;
+}
+input {
+  margin-left: 20px;
+  background-color: green;
+  color: white;
+  padding: 5px 15px;
+}
+select {
+  background-color: lemonchiffon;
+}
+
+select option {
+  text-align: center;
 }
 button {
   font-size: 20px;
@@ -8,6 +25,19 @@ button {
   width: 150px;
   cursor: pointer;
   outline: none;
+  position: relative;
+}
+
+.play-arrow {
+  width: 0;
+  height: 0;
+  transform: translate(-50%,-50%);
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 15px solid gainsboro;
+  position: absolute;
+  margin-left: 20px;
+  top: 50%;
 }
 
 .road {
