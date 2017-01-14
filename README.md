@@ -9,8 +9,8 @@ Summary instructions below:
 
 1. SELECT the time interval for lights to automatically change (default 5 mins)
 2. Click START to begin the animation
-3. Click PAUSE to pause animation and play button to resume
-4. Click RESET to reset animation after selecting new time interval
+3. Click PAUSE to pause animation and click PLAY button to resume
+4. Click RESET to reset animation after you SELECT a new time interval
 
 [Click this link for a live online demo](http://trafficlightsimulation.surge.sh/)
 
@@ -19,16 +19,14 @@ Summary instructions below:
 [image]: https://github.com/howardmann/traffic-light-simulation/blob/master/trafficlightscreen.png "Traffic light simulation"
 
 ## Local installation
-Clone the repo to a local directory on your computer, ensure you `cd` into the directory from the terminal command line, then run the following commands to install the node package dependencies, run the test suite and load the application:
+Clone the repo to a local directory on your computer, ensure you `cd` into the directory from the terminal command line, then run the following commands to install the node package dependencies, run the test suite and load the application. After running the terminal commands, open your browser and visit the following url `http://localhost:3000`
 ```
 npm install
 npm test
 npm start
 ```
 
-Open your browser and enter the following url `http://localhost:3000`
-
-Run unit tests with `npm test`
+Example output below after running tests with `npm test`
 
 ![mocha tests][test]
 
