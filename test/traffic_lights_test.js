@@ -334,11 +334,15 @@ describe('Crossing', function() {
 
     it('should reset the TrafficLight timer', function(){
       var e = {preventDefault: sinon.spy()};
-      var promise = Crossing.NS.timer(5);
-      this.clock.tick(2000);
+      // Start timer from 300 seconds/ 5 mins
+      var promise = Crossing.NS.timer(300);
+      // 100 seconds pass
+      this.clock.tick(100000);
+      Crossing.NS.countDown.should.equal(200);
+
+      // Call reset and reset the countDown clock (note countDown is 5 seconds less than the interval to account for yellow light change)
       Crossing.reset(e);
-      this.clock.tick(2000);
-      return promise.should.be.rejectedWith('timer reset');
+      Crossing.NS.countDown.should.equal(295);
     });
 
     it('should change the TrafficLight colors to red', function(done){

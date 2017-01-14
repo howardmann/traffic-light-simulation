@@ -57,16 +57,18 @@ var TrafficLight = {
 
   timer: function(seconds) {
     var self = this;
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
       var timeLeft = seconds;
       var interval = setInterval(function() {
         if (Crossing.pauseStatus) {
-          return Promise.reject('interval paused').catch(e => console.log(e));
+          return;
         }
         if (Crossing.resetStatus) {
           Crossing.resetStatus = false;
           clearInterval(interval);
-          return Promise.reject('timer reset').catch(e => console.log(e));
+          console.log(self.countDown);
+          return;
+          // return Promise.reject('timer reset').catch(e => console.log(e));
         }
         timeLeft--;
         self.countDown = timeLeft;
@@ -204,7 +206,7 @@ var Crossing =  {
 
   reset: function(e){
     this.toggleMe(e);
-    var value = this.$select.val();
+    var value = this.$select.val() || 300;
     this.NS.changeInterval(value);
     this.EW.changeInterval(value);
 
