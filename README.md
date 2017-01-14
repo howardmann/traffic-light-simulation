@@ -14,9 +14,9 @@ Summary instructions below:
 
 [Click this link for a live online demo](http://trafficlightsimulation.surge.sh/)
 
-![traffic light screenshot][logo]
+![traffic light screenshot][image]
 
-[logo]: https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 2"
+[image]: https://github.com/howardmann/traffic-light-simulation/blob/master/trafficlightscreen.png "Traffic light simulation"
 
 ## Local installation
 Clone the repo to a local directory on your computer, ensure you `cd` into the directory from the terminal command line, then run the following commands to install the node package dependencies, run the test suite and load the application:
