@@ -78,8 +78,8 @@ var TrafficLight = {
         }
         timeLeft--;
         self.countDown = timeLeft;
-        console.log(self.countDown, self.name);
         self.renderTimer();
+        // console.log(timeLeft, self.name, self.color);
 
         if (timeLeft <= 0) {
           clearInterval(interval);
@@ -93,7 +93,7 @@ var TrafficLight = {
     var self = this;
     return new Promise(function(resolve) {
       self.changeColor('green');
-      resolve();
+      return resolve();
     });
   },
 
@@ -125,15 +125,13 @@ var TrafficLight = {
       self.switchGreen()
         .then(() => self.timer(interval))
         .then(() => self.switchRed())
-        .then(function(){
-          resolve('played');
-        })
+        .then(() => resolve('played'));
     });
   }
 };
 
 var Crossing =  {
-  init: function(roadA, roadB) {
+  init: function() {
     this.NS = Object.create(TrafficLight);
     this.NS.init('north-south');
     this.EW = Object.create(TrafficLight);
@@ -170,6 +168,10 @@ var Crossing =  {
     });
   },
 
+  toggleMe: function(e){
+    e.preventDefault();
+  },
+
   setInterval: function(e){
     this.toggleMe(e);
     var value = this.$select.val();
@@ -178,16 +180,6 @@ var Crossing =  {
     this.$start.fadeOut(100);
     this.$reset.fadeIn(1000);
     this.play();
-  },
-
-  toggleMe: function(e){
-    e.preventDefault();
-  },
-
-  pause: function(){
-    this.pauseStatus = true;
-    this.playStatus = false;
-    return 'paused';
   },
 
   play: function(){
@@ -205,13 +197,19 @@ var Crossing =  {
       self.playStatus = true;
       self.NS.playSchedule()
         .then(function(){
-          self.EW.playSchedule()
+          return self.EW.playSchedule()
         })
         .then(function(){
           self.playStatus = false;
           self.play();
         })
     }
+  },
+
+  pause: function(){
+    this.pauseStatus = true;
+    this.playStatus = false;
+    return 'paused';
   },
 
   reset: function(e){

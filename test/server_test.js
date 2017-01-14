@@ -22,7 +22,7 @@ describe('Server', function(){
       .get('/')
       .end(function(err, res) {
         var $ = cheerio.load(res.text);
-        ($('#traffic h1').text()).should.equal('Traffic Lights');
+        ($('#traffic h1').text()).should.include('Traffic lights');
         done();
       })
   }),

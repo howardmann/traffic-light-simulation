@@ -22,7 +22,6 @@ var Crossing = require('../public/traffic_lights.js').Crossing;
 var pause = require('../public/traffic_lights.js').pause;
 var NS = Object.create(TrafficLight);
 
-
 describe('TrafficLight', function() {
   describe('Object.create(TrafficLight)', function() {
     it('should construct a new TrafficLight object via the OLOO pattern', function(done) {
@@ -312,17 +311,6 @@ describe('Crossing', function() {
       done();
     });
 
-    it('should then play the EW TrafficLight schedule', function(){
-      var self = this;
-      var EWplaySchedule = sinon.spy(Crossing.EW, 'playSchedule');
-      expect(EWplaySchedule.called).to.equal(false);
-      Crossing.NS.playSchedule()
-        .then(function(){
-          Crossing.EW.playSchedule();
-          expect(EWplaySchedule.called).to.equal(false);
-        })
-    });
-
     it('should keep playing itself in a loop recursively');
 
   });
@@ -417,6 +405,5 @@ describe('Crossing', function() {
       done();
     });
   });
-
 
 });
