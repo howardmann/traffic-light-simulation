@@ -3,13 +3,13 @@
 ## Summary
 Simulation of two sets of traffic lights at an intersection.
 
-Traffic light colors change between green, yellow and red before alternating every 5 minutes. Lights stay yellow for 5 seconds before changing red. Users can customize the time between traffic lights alternating as well as pause and play the animation.
+Traffic light colors change between green, yellow and red before alternating every five minutes. Lights stay yellow for five seconds before changing red. Users can customize the time between traffic lights alternating as well as pause and play the animation.
 
 Summary instructions below:
 
 1. SELECT the time interval for lights to automatically change (default 5 mins)
 2. Click START to begin animation
-3. Click PAUSE to pause animation and click PLAY button to resume
+3. Click PAUSE to pause animation and click PLAY to resume
 4. Click RESET to reset animation
 
 [Click this link or image below for a live online demo](http://trafficlightsimulation.surge.sh/)
