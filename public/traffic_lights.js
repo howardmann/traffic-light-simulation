@@ -60,11 +60,11 @@ var TrafficLight = {
     return new Promise(function(resolve) {
       var timeLeft = seconds;
       var interval = setInterval(function() {
-        if (Crossing.pauseStatus) {
+        if (Intersection.pauseStatus) {
           return;
         }
-        if (Crossing.resetStatus) {
-          Crossing.resetStatus = false;
+        if (Intersection.resetStatus) {
+          Intersection.resetStatus = false;
           clearInterval(interval);
           return;
         }
@@ -80,14 +80,6 @@ var TrafficLight = {
     });
   },
 
-  switchGreen: function() {
-    var self = this;
-    return new Promise(function(resolve) {
-      self.changeColor('green');
-      return resolve();
-    });
-  },
-
   switchRed: function() {
     var self = this;
     return new Promise(function(resolve) {
@@ -95,7 +87,7 @@ var TrafficLight = {
       self.timer(5)
         .then(function() {
           self.changeColor('red');
-          resolve();
+          resolve('resolve switchRed');
         });
     });
   },
@@ -106,21 +98,25 @@ var TrafficLight = {
     var interval = this.interval - 5;
 
     // Pause condition
-    if (Crossing.pauseStatus) {
+    if (Intersection.pauseStatus) {
       return 'paused';
     };
 
     // Play script, start green, stay green for interval duration, switch to yellow for 5 seconds, switch Red and then resolve
     return new Promise(function(resolve){
-      self.switchGreen()
-        .then(() => self.timer(interval))
-        .then(() => self.switchRed())
-        .then(() => resolve('played'));
+      self.changeColor('green');
+      self.timer(interval)
+        .then(function(){
+          self.switchRed()
+            .then(function(){
+              resolve('resolve playSchedule');
+            })
+        })
     });
   }
 };
 
-var Crossing =  {
+var Intersection =  {
   init: function() {
     this.NS = Object.create(TrafficLight);
     this.NS.init('north-south');
@@ -218,4 +214,4 @@ var Crossing =  {
   }
 };
 
-module.exports = {TrafficLight, timeHelper, Crossing};
+module.exports = {TrafficLight, timeHelper, Intersection};

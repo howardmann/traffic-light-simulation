@@ -18,7 +18,7 @@ global.$ = require('jquery');
 
 var TrafficLight = require('../public/traffic_lights.js').TrafficLight;
 var timeHelper = require('../public/traffic_lights.js').timeHelper;
-var Crossing = require('../public/traffic_lights.js').Crossing;
+var Intersection = require('../public/traffic_lights.js').Intersection;
 var NS = Object.create(TrafficLight);
 
 describe('TrafficLight', function() {
@@ -27,8 +27,6 @@ describe('TrafficLight', function() {
       NS.init.should.be.a('function');
       NS.changeColor.should.be.a('function');
       NS.timer.should.be.a('function');
-      NS.switchRed.should.be.a('function');
-      NS.switchGreen.should.be.a('function');
       NS.playSchedule.should.be.a('function');
       done();
     })
@@ -36,8 +34,8 @@ describe('TrafficLight', function() {
 
   describe('init(string)', function() {
     it('should set the TrafficLight name', function(done) {
-        NS.init('North South');
-        NS.name.should.equal('North South');
+        NS.init('north-south');
+        NS.name.should.equal('north-south');
         done();
     });
 
@@ -90,7 +88,6 @@ describe('TrafficLight', function() {
       this.clock.tick(300000);
       return interval.should.eventually.equal('end timer');
     });
-
   });
 
   describe('switchRed()', function() {
@@ -108,35 +105,28 @@ describe('TrafficLight', function() {
       done();
     });
 
-    it('should change the TrafficLight color to yellow for 5 seconds;', function() {
+    it('should first turn color yellow', function(done){
       NS.switchRed();
-      this.clock.tick(500);
       NS.color.should.equal('yellow');
+      done();
+    });
 
-      this.clock.tick(3500);
-      NS.color.should.equal('yellow');
+    it('should stay yellow for 5 seconds before switching red', function(){
+      var self = NS;
 
+      // Mock promise to test callbacks within the promise
+      var promise = new Promise(function(resolve){
+        self.changeColor('yellow');
+        self.color.should.equal('yellow');  //test
+        self.timer(5)
+          .then(function() {
+            self.changeColor('red');
+            self.color.should.equal('red');  //test
+            resolve('resolve switchRed');
+          });
+      });
       this.clock.tick(5000);
-    });
-
-    it("should then change TrafficLight color to red after 5 seconds;", function(done) {
-      NS.color.should.equal('red');
-      done();
-    });
-  });
-
-  describe('switchGreen()', function() {
-    it('should return a promise', function(done) {
-      NS.switchGreen().should.be.a('promise');
-      done();
-    });
-
-    it('should call method changeColor("green")', function(done) {
-      var changeColor = sinon.spy(NS, 'changeColor');
-      NS.switchGreen();
-      (changeColor.called).should.be.true;
-      NS.color.should.equal('green');
-      done();
+      return expect(promise).to.eventually.equal('resolve switchRed');
     });
   });
 
@@ -154,61 +144,34 @@ describe('TrafficLight', function() {
       done();
     });
 
-    it('should call method switchGreen()', function(done) {
-      var switchGreen = sinon.spy(NS, 'switchGreen');
+    it('should first turn color green', function(done) {
       NS.playSchedule();
-      (switchGreen.called).should.be.true;
       NS.color.should.equal('green');
       done();
     });
 
-    it('should stay green for 5 minutes by calling method timer(300)', function() {
-      var self = this;
-      var interval = 300;
-
-      NS.switchGreen()
-        .then(function() {
-          NS.timer(interval);
-          self.clock.tick(interval * 1000);
-        });
-
-      NS.color.should.equal('green');
-    });
-
-    it('should then turn yellow first by by calling method switchRed()', function() {
-      var self = this;
-      var interval = 300;
+    it('should stay green for specified interval before switchingRed', function() {
+      var interval = 300 - 5;
+      var self = NS;
       var switchRed = sinon.spy(NS, 'switchRed');
 
-      NS.switchGreen()
-        .then(function() {
-          NS.timer(interval);
-          self.clock.tick(interval * 1000);
-        })
-        .then(function() {
-          NS.switchRed();
-          expect(switchRed.called).to.be.true;
-        });
-    });
-
-    it('should eventually resolve promise', function() {
-      var self = this;
-      var interval = 300;
-      var promise = new Promise(function(resolve) {
-        NS.switchGreen()
-          .then(function() {
-            NS.timer(interval);
-            self.clock.tick(interval * 1000);
+      // Mock promise to test callbacks within the promise
+      var promise = new Promise(function(resolve){
+        self.changeColor('green');
+        self.color.should.equal('green'); // Test
+        self.timer(interval)
+          .then(function(){
+            self.color.should.equal('green');  // Test
+            self.switchRed();
+            expect(switchRed.called).to.be.true;  // Test
+            self.color.should.equal('yellow');  // Test
           })
-          .then(function() {
-            NS.switchRed();
-            self.clock.tick(5000);
+          .then(function(){
+            resolve();
           })
-          .then(function() {
-            resolve('played');
-          });
-      })
-      return expect(promise).to.have.been.fulfilled;
+      });
+      this.clock.tick(interval * 1000);
+      return expect(promise).to.be.fulfilled;
     });
   });
 });
@@ -228,19 +191,19 @@ describe('timeHelper', function() {
 
 });
 
-describe('Crossing', function() {
+describe('Intersection', function() {
   beforeEach(function(){
-    Crossing.init();
+    Intersection.init();
   });
   describe('init()', function(){
-    it('should initialize two TrafficLights for the Crossing: NS and EW', function(done) {
-      Crossing.NS.name.should.equal('north-south');
-      Crossing.EW.name.should.equal('east-west');
+    it('should initialize two TrafficLights for the Intersection: NS and EW', function(done) {
+      Intersection.NS.name.should.equal('north-south');
+      Intersection.EW.name.should.equal('east-west');
       done();
     });
     it('should set default pause and play status as false', function(done) {
-      Crossing.pauseStatus.should.equal(false);
-      Crossing.playStatus.should.equal(false);
+      Intersection.pauseStatus.should.equal(false);
+      Intersection.playStatus.should.equal(false);
       done();
     });
   });
@@ -255,28 +218,28 @@ describe('Crossing', function() {
     });
 
     it('should set set pause property to true', function(done){
-      Crossing.pauseStatus.should.equal(false);
-      Crossing.pause();
-      Crossing.pauseStatus.should.equal(true);
-      Crossing.playStatus.should.equal(false);
-      Crossing.pause().should.equal('paused');
+      Intersection.pauseStatus.should.equal(false);
+      Intersection.pause();
+      Intersection.pauseStatus.should.equal(true);
+      Intersection.playStatus.should.equal(false);
+      Intersection.pause().should.equal('paused');
       done();
     });
 
     it('should pause the timer countdown when called', function(){
-      var promise = Crossing.NS.timer(3);
+      var promise = Intersection.NS.timer(3);
       this.clock.tick(1000);
-      Crossing.pause();
-      Crossing.NS.countDown.should.equal(2);
+      Intersection.pause();
+      Intersection.NS.countDown.should.equal(2);
       this.clock.tick(3000);
-      Crossing.NS.countDown.should.equal(2);
-      Crossing.pauseStatus.should.equal(true);
+      Intersection.NS.countDown.should.equal(2);
+      Intersection.pauseStatus.should.equal(true);
     });
 
     it('should pause the playSchedule function by returning', function(done){
-      Crossing.pause();
-      Crossing.NS.playSchedule().should.equal('paused');
-      Crossing.EW.playSchedule().should.equal('paused');
+      Intersection.pause();
+      Intersection.NS.playSchedule().should.equal('paused');
+      Intersection.EW.playSchedule().should.equal('paused');
       done();
     });
   });
@@ -291,32 +254,32 @@ describe('Crossing', function() {
     });
 
     it('should return if pause() has been called earlier', function(done){
-      Crossing.pause();
-      var result = Crossing.play();
+      Intersection.pause();
+      var result = Intersection.play();
       result.should.equal('paused');
       done();
     });
 
     it('should not be able to be played more than once at a time', function(){
-      Crossing.play();
+      Intersection.play();
       this.clock.tick(1000);
-      Crossing.play().should.equal('played');
+      Intersection.play().should.equal('played');
     });
 
     it('should resume the timer countdown after play() is called', function(){
-      var promise = Crossing.NS.timer(3);
+      var promise = Intersection.NS.timer(3);
       this.clock.tick(1000);
-      Crossing.pause();
-      Crossing.NS.countDown.should.equal(2);
+      Intersection.pause();
+      Intersection.NS.countDown.should.equal(2);
       this.clock.tick(3000);
-      Crossing.play();
+      Intersection.play();
       this.clock.tick(2000);
       return promise.should.eventually.equal('end timer');
     });
 
     it('should play the NS TrafficLight schedule first', function(done){
-      var NSplaySchedule = sinon.spy(Crossing.NS, 'playSchedule');
-      Crossing.play();
+      var NSplaySchedule = sinon.spy(Intersection.NS, 'playSchedule');
+      Intersection.play();
       expect(NSplaySchedule.called).to.be.true;
       done();
     });
@@ -335,40 +298,40 @@ describe('Crossing', function() {
     it('should reset the TrafficLight timer', function(){
       var e = {preventDefault: sinon.spy()};
       // Start timer from 300 seconds/ 5 mins
-      var promise = Crossing.NS.timer(300);
+      var promise = Intersection.NS.timer(300);
       // 100 seconds pass
       this.clock.tick(100000);
-      Crossing.NS.countDown.should.equal(200);
+      Intersection.NS.countDown.should.equal(200);
 
       // Call reset and reset the countDown clock (note countDown is 5 seconds less than the interval to account for yellow light change)
-      Crossing.reset(e);
-      Crossing.NS.countDown.should.equal(295);
+      Intersection.reset(e);
+      Intersection.NS.countDown.should.equal(295);
     });
 
     it('should change the TrafficLight colors to red', function(done){
-      var NSchangeColor = sinon.spy(Crossing.NS, 'changeColor');
-      var EWchangeColor = sinon.spy(Crossing.EW, 'changeColor');
+      var NSchangeColor = sinon.spy(Intersection.NS, 'changeColor');
+      var EWchangeColor = sinon.spy(Intersection.EW, 'changeColor');
       var e = {preventDefault: sinon.spy()};
-      Crossing.reset(e);
+      Intersection.reset(e);
       expect(NSchangeColor.called).to.be.true;
       expect(EWchangeColor.called).to.be.true;
       done();
     })
 
     it('should update the time interval for NS and EW TrafficLights', function(done){
-      var NSchangeInterval = sinon.spy(Crossing.NS, 'changeInterval');
-      var EWchangeInterval = sinon.spy(Crossing.EW, 'changeInterval');
+      var NSchangeInterval = sinon.spy(Intersection.NS, 'changeInterval');
+      var EWchangeInterval = sinon.spy(Intersection.EW, 'changeInterval');
       var e = {preventDefault: sinon.spy()};
-      Crossing.reset(e);
+      Intersection.reset(e);
       expect(NSchangeInterval.called).to.be.true;
       expect(EWchangeInterval.called).to.be.true;
       done();
     });
 
     it('should then play traffic', function(done){
-      var play = sinon.spy(Crossing, 'play');
+      var play = sinon.spy(Intersection, 'play');
       var e = {preventDefault: sinon.spy()};
-      Crossing.reset(e);
+      Intersection.reset(e);
       expect(play.called).to.be.true;
       play.restore();
       done();
@@ -382,7 +345,7 @@ describe('Crossing', function() {
         target: div,
         preventDefault: sinon.spy()
       };
-      Crossing.toggleMe(e);
+      Intersection.toggleMe(e);
       expect(e.preventDefault.called).to.be.true;
       done();
     });
@@ -399,19 +362,19 @@ describe('Crossing', function() {
     });
 
     it('should change the duration interval for both NS and EW TrafficLights', function(done){
-      var NSchangeInterval = sinon.spy(Crossing.NS, 'changeInterval');
-      var EWchangeInterval = sinon.spy(Crossing.EW, 'changeInterval');
+      var NSchangeInterval = sinon.spy(Intersection.NS, 'changeInterval');
+      var EWchangeInterval = sinon.spy(Intersection.EW, 'changeInterval');
       var e = {preventDefault: sinon.spy()};
-      Crossing.setInterval(e);
+      Intersection.setInterval(e);
       expect(NSchangeInterval.called).to.be.true;
       expect(EWchangeInterval.called).to.be.true;
       done();
     });
 
     it('should finally call play() to start the traffic animation', function(done){
-      var play = sinon.spy(Crossing, 'play');
+      var play = sinon.spy(Intersection, 'play');
       var e = {preventDefault: sinon.spy()};
-      Crossing.setInterval(e);
+      Intersection.setInterval(e);
       expect(play.called).to.be.true;
       play.restore();
       done();
