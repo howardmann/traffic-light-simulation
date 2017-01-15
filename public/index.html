@@ -23,22 +23,27 @@
       <input id ="start" type="submit" value="START">
       <input id ="reset" type="submit" value="RESET">
     </form>
-    <div class="button-container">
+
+    <div class="road-container clearfix">
+      <div class="road north-south">
+        <h3>North South Rd</h3>
+        <p class="color">STOP</p>
+        <p class="timer"></p>
+      </div>
+
+      <div class="road east-west">
+        <h3>East West Rd</h3>
+        <p class="color">STOP</p>
+        <p class="timer"></p>
+      </div>
+    </div>
+
+    <div class="button-container clearfix">
       <button id="play" class="inactive">PLAY <span class="play-arrow"></span></button>
       <button id="pause" class="inactive">PAUSE</button>
     </div>
 
-    <div class="road north-south">
-      <h3>North South Rd</h3>
-      <p class="color">STOP</p>
-      <p class="timer"></p>
-    </div>
 
-    <div class="road east-west">
-      <h3>East West Rd</h3>
-      <p class="color">STOP</p>
-      <p class="timer"></p>
-    </div>
   </div>
 
   <script src="lib/jquery.js"></script>

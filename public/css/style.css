@@ -1,3 +1,13 @@
+* {
+  box-sizing: border-box
+}
+
+.clearfix:after {
+ content: '';
+ clear: both;
+ display: block;
+}
+
 body {
   padding: 0% 2%;
   font-family: 'arial';
@@ -65,7 +75,10 @@ button {
   color: gainsboro;
   border-width: 0px;
 }
-
+.road-container {
+  display: block;
+  width: 100%;
+}
 .button-container {
   display: block;
   width: 100%;
