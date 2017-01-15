@@ -12,8 +12,9 @@ app.use(function(req, res){
   res.status(404).send('404 error');
 });
 
-app.listen(3000, function(){
-  console.log("Visit in browser: http://localhost:3000");
+app.listen(3000, '0.0.0.0', function(){
+  // console.log("Visit in browser: http://localhost:3000");
+  console.log("Visit in browser: http://192.168.1.1:3000");
 });
 
 module.exports = app;
