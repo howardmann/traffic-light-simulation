@@ -1,4 +1,4 @@
-# Traffic light at intersection simulation
+# Traffic lights at intersection simulation
 
 ## Summary
 Simulation of traffic lights at an intersection of two roads.
